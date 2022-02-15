@@ -1,5 +1,6 @@
 from aiogram import types
 
+from keyboards import kb_client
 from loader import dp, bot
 
 
@@ -9,7 +10,8 @@ async def on_start(message: types.Message):
     функция обрабатывает входящие сообщения при нажатии на команду start or help
     """
     try:
-        await bot.send_message(message.from_user.id, f'Приятного аппетита, {message.from_user.first_name}!')
+        await bot.send_message(message.from_user.id, f'Приятного аппетита, {message.from_user.first_name}!',
+                               reply_markup=kb_client)
         # await message.delete()
     except:
         await message.reply('Для общения с ботом напишите ему в ЛС: \nhttps://t.me/PizzaMuralhaBot')
