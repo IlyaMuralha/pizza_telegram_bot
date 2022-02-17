@@ -1,5 +1,6 @@
 from aiogram import types
 
+from data_base import sqlite_db
 from keyboards import kb_client
 from loader import dp, bot
 
@@ -25,3 +26,8 @@ async def pizza_open_command(message: types.Message):
 @dp.message_handler(commands=['Расположение'])
 async def pizza_place_command(message: types.Message):
     await bot.send_message(message.from_user.id, 'Пицерийная, 18а')
+
+
+@dp.message_handler(commands=['Меню'])
+async def pizza_menu_command(message: types.Message):
+    await sqlite_db.get_product_from_menu(message)

@@ -6,6 +6,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
+from data_base import sqlite_db
+from keyboards import kb_admin
 from loader import dp, bot
 from settings.config import ADMINS
 
@@ -28,7 +30,7 @@ class FSMAdmin(StatesGroup):
 async def make_changes_commends(message: types.Message):
     global ID
     ID = message.from_user.id
-    await bot.send_message(message.from_user.id, 'Что хозяин надо?')
+    await bot.send_message(message.from_user.id, 'Что хозяин надо?', reply_markup=kb_admin)
     await message.delete()
 
 
@@ -93,9 +95,10 @@ async def load_description(message: types.Message, state: FSMContext):
 async def load_price(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['price'] = float(message.text)
-
-    # пока нет базы можно вывести админу или сохранить в файл
-    async with state.proxy() as data:
-        await message.reply(str(data))
+    # # пока нет базы можно вывести админу или сохранить в файл
+    # async with state.proxy() as data:
+    #     await message.reply(str(data))
+    await sqlite_db.sql_add_command(state)
+    logging.debug('Данные сохранены в меню')
 
     await state.finish()

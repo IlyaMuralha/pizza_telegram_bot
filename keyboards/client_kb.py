@@ -1,4 +1,4 @@
-"""модуль для создания текстовых кнопок"""
+"""модуль для создания текстовых кнопок интерфейса клиента"""
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 # создаём кнопку
