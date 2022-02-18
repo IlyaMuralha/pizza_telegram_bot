@@ -5,11 +5,11 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from data_base import sqlite_db
 from keyboards import kb_admin
 from loader import dp, bot
-from settings.config import ADMINS
 
 ID = None
 
@@ -102,3 +102,19 @@ async def load_price(message: types.Message, state: FSMContext):
     logging.debug('Данные сохранены в меню')
 
     await state.finish()
+
+
+@dp.callback_query_handler(lambda x: x.data and x.data.startswith('Del '))
+async def del_callback_run(callback_query: types.CallbackQuery):
+    await sqlite_db.sql_delete_command(callback_query.data.replace("Del ", ""))
+    await callback_query.answer(text=f'{callback_query.data.replace("Del ", "")} удалена', show_alert=True)
+
+
+@dp.message_handler(commands='Удалить')
+async def delete_item(message: types.Message):
+    if message.from_user.id == ID:
+        read = await sqlite_db.get_list_product_from_menu()
+        for ret in read:
+            await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание: {ret[2]}\nЦена = {ret[-1]}')
+            await bot.send_message(message.from_user.id, text='^^^', reply_markup=InlineKeyboardMarkup().add(
+                InlineKeyboardButton(f'Удалить {ret[1]}', callback_data=f'Del {ret[1]}')))
